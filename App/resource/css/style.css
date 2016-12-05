@@ -1,0 +1,24 @@
+table{
+    width: 100%;
+    border: thin 1px black ;
+    border-collapse: collapse;
+    margin-top: 25px;
+    margin-bottom: 30px;
+}
+.titulo_tabela{
+    font-size: 25px;
+    font-weight: bold;
+    text-transform: capitalize;
+
+}
+.fundo_gray{
+    background-color:lightgrey ;
+}
+.campos_cabecalho td{
+    font-weight: bold;
+    font-size: 16px;
+}
+.campos_texto td{
+
+    font-size: 16px;
+}
