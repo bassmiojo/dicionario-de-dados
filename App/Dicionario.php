@@ -143,9 +143,22 @@ class Dicionario
     {
         try {
             if (empty($this->getDataBase())) {
-                throw new Exception("Banco de Dados não informado.");
+                throw new Exception("Tipo de Banco de Dados não informado.");
 
             }
+            if (empty($this->getHost())) {
+                throw new Exception("Host não informado.");
+
+            }
+            if (empty($this->getUser())) {
+                throw new Exception("user não informado.");
+
+            }
+            if (empty($this->getDbName())) {
+                throw new Exception("banco de dados não informado.");
+
+            }
+
             if (!in_array($this->getDataBase(), $this->getDataBasesSuporte())) {
 
                 $mensage = "<b>'".$this->getDataBase()."'</b> não é um Banco de Dados suportado.<br><br>";

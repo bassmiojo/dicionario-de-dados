@@ -35,14 +35,15 @@ class Sqlserver
         $model = new Conection("sqlsrv", $dataConection["host"], $dataConection["db_name"], $dataConection["user"], $dataConection["password"]);
 
         $this->instance_con = $model->con;
-        
+
         $tables = $this->get_table();
 
         foreach ($tables as $row) {
 
 
 
-            $tables_name = $row["tablename"];
+            $tables_name = $row["name"];
+
             $this->data[$tables_name]["title"] = $tables_name;
             $column = $this->get_column($tables_name);
 
@@ -50,15 +51,14 @@ class Sqlserver
 
 
         }
-        
+
         return $this;
 
     }
 
     public function get_table()
     {
-        $result = $this->instance_con->query("Select * from pg_tables where schemaname='public'");
-        $result->execute();
+        $result = $this->instance_con->query("SELECT * FROM SYSOBJECTS WHERE XTYPE='U'");
 
         return $result->fetchAll();
 
@@ -67,8 +67,23 @@ class Sqlserver
 
     public function get_column($table)
     {
-        $result = $this->instance_con->query("SELECT * FROM information_schema.columns where table_name='{$table}'");
-        $result->execute();
+
+        $result = $this->instance_con->query("SELECT 
+    COLUNAS.NAME AS COLUNA,
+    TIPOS.NAME AS TIPO,
+    COLUNAS.LENGTH AS TAMANHO,
+    COLUNAS.ISNULLABLE AS EH_NULO
+ 
+FROM 
+    SYSOBJECTS AS TABELAS,
+    SYSCOLUMNS AS COLUNAS,
+    SYSTYPES   AS TIPOS
+WHERE 
+    -- JOINS 
+    TABELAS.ID = COLUNAS.ID
+    AND COLUNAS.USERTYPE = TIPOS.USERTYPE
+    AND TABELAS.NAME = '$table'");
+        //$result->execute();
         return $result->fetchAll();
     }
 
@@ -80,20 +95,20 @@ class Sqlserver
         foreach ($column as $row) {
             /* nome da coluna*/
             $data_column[$contador]["indice"] = $contador;
-            $data_column[$contador]["column_name"] = $row["column_name"];
+            $data_column[$contador]["column_name"] = $row["COLUNA"];
 
             /* tipo do dado*/
-            $data_column[$contador]["data_type"] = $row["data_type"];
+            $data_column[$contador]["data_type"] = $row["TIPO"];
 
             /*quantidade de caracteres*/
-            if (!empty($row["character_maximum_length"])) {
-                $data_column[$contador]["character_maximum_length"] = "(" . $row["character_maximum_length"] . ")";
+            if (!empty($row["TAMANHO"])) {
+                $data_column[$contador]["character_maximum_length"] = "(" . $row["TAMANHO"] . ")";
             }else{
                 $data_column[$contador]["character_maximum_length"]="";
             }
 
             /*se é nulo ou não*/
-            if ($row["is_nullable"] == 'NO'){
+            if ($row["EH_NULO"]){
                 $data_column[$contador]["is_nullable"]="Não Nulo";
             }else{
                 $data_column[$contador]["is_nullable"]="";
